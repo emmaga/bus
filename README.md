@@ -24,4 +24,8 @@ npm run unit
 npm test
 ```
 
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+## 微信访问的首页地址
+
+``` bash
+https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxeae127ff98a4c844&redirect_uri=http://openvoddev.cleartv.cn/wx/bus/index.html&response_type=code&scope=snsapi_base&state=1&component_appid=wxc6e8a3fab4f25a4f#wechat_redirect
+```

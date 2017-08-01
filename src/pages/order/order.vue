@@ -7,13 +7,15 @@
 </template>
 
 <script>
-import orderAdd from '@/components/orderAdd'
-import orderList from '@/components/orderList'
+import orderAdd from '@/pages/order/orderAdd'
+import orderList from '@/pages/order/orderList'
 export default {
   name: 'order',
   data () {
     return {
     }
+  },
+  created () {
   },
   components: {
     orderAdd, orderList

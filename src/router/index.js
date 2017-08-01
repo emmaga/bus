@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import order from '@/pages/order'
+import order from '@/pages/order/order'
 
 Vue.use(Router)
 
