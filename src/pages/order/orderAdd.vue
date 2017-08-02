@@ -1,47 +1,59 @@
 <template>
   <div>
-    <!--线路-->
-    <mt-button @click.native="routeListPopup = true" size="large">{{routeList[0].value}}</mt-button>
-    <mt-popup v-model="routeListPopup" position="bottom" class="mint-popup-bottom">
-      <mt-picker :slots="routeList" @change="onRouteListChange"></mt-picker>
-    </mt-popup>
-    <!--线路-->
-    <!--班车日期-->
-    <div class="page-datetime">
-      <div class="page-datetime-wrapper">
-        <mt-button @click.native="open('picker1')" size="large">{{orderDateString}}</mt-button>
+    <div class="card-body">
+      <!--线路-->
+      <h2>班车线路</h2>
+      <mt-button @click.native="routeListPopup = true" size="large">{{routeList[0].value}}</mt-button>
+      <mt-popup v-model="routeListPopup" position="bottom" class="mint-popup-bottom">
+        <mt-picker :slots="routeList" @change="onRouteListChange"></mt-picker>
+      </mt-popup>
+      <!--线路-->
+      <br>
+      <!--班车日期-->
+      <h2>预约日期</h2>
+      <div class="page-datetime">
+        <div class="page-datetime-wrapper">
+          <mt-button @click.native="open('picker1')" size="large">{{orderDateString}}</mt-button>
+        </div>
+        <mt-datetime-picker
+          ref="picker1"
+          v-model="date"
+          type="date"
+          :startDate="startDate"
+          :endDate="endDate"
+          @confirm="handleChange">
+        </mt-datetime-picker>
       </div>
-      <mt-datetime-picker
-        ref="picker1"
-        v-model="date"
-        type="date"
-        :startDate="startDate"
-        :endDate="endDate"
-        @confirm="handleChange">
-      </mt-datetime-picker>
+      <!--班车日期-->
+      <br>
+      <!--班次-->
+      <h2>出发时间</h2>
+      <mt-button @click.native="lineListPopup = true" size="large">{{lineList[0].value}}</mt-button>
+      <mt-popup v-model="lineListPopup" position="bottom" class="mint-popup-bottom">
+        <mt-picker :slots="lineList" @change="onLineListChange"></mt-picker>
+      </mt-popup>
+      <!--班次-->
+      <br>
+      <!--人数-->
+      <h2>乘车人数</h2>
+      <mt-button @click.native="peopleCountPopup = true" size="large">{{peopleCount[0].value}}</mt-button>
+      <mt-popup v-model="peopleCountPopup" position="bottom" class="mint-popup-bottom">
+        <mt-picker :slots="peopleCount" @change="onPeopleCountChange"></mt-picker>
+      </mt-popup>
+      <!--人数-->
+      <br>
+      <!--联系人姓名-->
+      <mt-field label="联系人" placeholder="请输入姓名" v-model="orderName" :state="orderNameState"></mt-field>
+      <!--联系人姓名-->
+      <!--手机-->
+      <mt-field type="tel" label="手机" placeholder="请输入手机号码" v-model="phoneNum" :state="phoneNumState"></mt-field>
+      <!--手机-->
     </div>
-    <!--班车日期-->
-    <!--班次-->
-    <mt-button @click.native="lineListPopup = true" size="large">{{lineList[0].value}}</mt-button>
-    <mt-popup v-model="lineListPopup" position="bottom" class="mint-popup-bottom">
-      <mt-picker :slots="lineList" @change="onLineListChange"></mt-picker>
-    </mt-popup>
-    <!--班次-->
-    <!--姓名-->
-    <mt-field label="姓名" placeholder="请输入姓名" v-model="orderName" :state="orderNameState"></mt-field>
-    <!--姓名-->
-    <!--手机-->
-    <mt-field type="tel" label="手机" placeholder="请输入手机号码" v-model="phoneNum" :state="phoneNumState"></mt-field>
-    <!--手机-->
-    <!--人数-->
-    <mt-button @click.native="peopleCountPopup = true" size="large">{{peopleCount[0].value}}</mt-button>
-    <mt-popup v-model="peopleCountPopup" position="bottom" class="mint-popup-bottom">
-      <mt-picker :slots="peopleCount" @change="onPeopleCountChange"></mt-picker>
-    </mt-popup>
-    <!--人数-->
-    <!--提交按钮-->
-    <mt-button @click.native="submitForm()" :disabled="ordering" type="primary">{{orderBtnStr}}</mt-button>
-    <!--提交按钮-->
+    <div class="card-footer">
+      <!--提交按钮-->
+      <mt-button @click.native="submitForm()" :disabled="ordering" type="primary" style="width: 100%">{{orderBtnStr}}</mt-button>
+      <!--提交按钮-->
+    </div>
   </div>
 </template>
 
@@ -213,5 +225,9 @@ export default {
   .picker-slot-wrapper, .picker-item {
     backface-visibility: hidden;
   }
+}
+
+h2{
+  margin-bottom: 0.325rem
 }
 </style>
