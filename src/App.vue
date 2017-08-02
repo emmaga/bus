@@ -11,16 +11,14 @@ export default {
 </script>
 
 <style>
-
-body{
-	color: rgb(41,41,41);
-	background: rgb(245,245,245)
-}
+  body{
+  	color: rgb(41,41,41);
+  	background: rgb(245,245,245)
+  }
  .card {
     border: solid 1px rgb(233,233,233);
     border-radius: 0.5rem;
     margin-bottom: 0.5rem;
-    /*text-align: center;*/
     background: rgb(255,255,255)
   }
   .card h1{
@@ -61,5 +59,4 @@ body{
     font-size: 1.25em;
     color: rgb(230,140,40)
   }
-
 </style>

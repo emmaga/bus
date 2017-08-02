@@ -114,6 +114,4 @@ export default {
   .mint-swipe-item {
     line-height: 200px;
   }
- 
-
 </style>

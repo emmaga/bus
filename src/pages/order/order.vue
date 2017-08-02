@@ -1,15 +1,13 @@
 <template>
   <div>
     <order-list></order-list>
-    <div class="card" style="margin-bottom: 4rem">
+    <div class="card">
       <v-if v-if="orderNum > 0">
         <div class="card-title">
           <h1>继续预约</h1>
         </div>
       </v-if>
-
-        <order-add></order-add>
-      
+      <order-add></order-add>
     </div>
   </div>
 </template>

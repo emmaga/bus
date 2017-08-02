@@ -138,7 +138,7 @@ export default {
       this.phoneNumOrig = false
       if (!this.validated) {
         Toast({
-          message: '还有信息没填对或者填错啦',
+          message: '还有信息没填或者填错啦',
           position: 'center',
           duration: 5000
         })

@@ -29,3 +29,9 @@ npm test
 ``` bash
 https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxeae127ff98a4c844&redirect_uri=http://openvoddev.cleartv.cn/wx/bus/index.html&response_type=code&scope=snsapi_base&state=1&component_appid=wxc6e8a3fab4f25a4f#wechat_redirect
 ```
+
+## mock clear_session
+
+``` bash
+src/mock/index.js enableMock 设为false为正常项目使用，设为true为测试参数，读取的是 src/mock/data.js 内的数据
+```
