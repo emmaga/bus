@@ -20,7 +20,10 @@
           </mt-swipe>
         </div>
         <div class="card-footer">
-          <h2>如有疑问请拨打&nbsp{{item.LineInfo.RouteInfo.Phone}}</h2>
+          <p>
+            您已预约{{item.Number}}人乘车
+            <br>如有疑问请拨打&nbsp{{item.LineInfo.RouteInfo.Phone}}
+          </p>
         </div>
       </div>
       <!-- 预约成功 -->
