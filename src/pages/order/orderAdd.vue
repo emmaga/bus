@@ -47,7 +47,7 @@
 
 <script>
 import {apiGetRouteList, apiSubmitOrder} from '@/http/api'
-import {MessageBox, Toast} from 'mint-ui'
+import {MessageBox, Toast, Indicator} from 'mint-ui'
 import moment from 'moment'
 export default {
   name: 'orderAdd',
@@ -178,13 +178,17 @@ export default {
       this.orderDate = value.toString()
     },
     getRouteList () {
+      Indicator.open()
       apiGetRouteList().then((data) => {
+        Indicator.close()
         this.routeListData = data.RouteInfo
         data.RouteInfo.forEach((val, index) => {
           if (val.LineInfo.length > 0) {
             this.routeList[0].values.push(val.Name)
           }
         })
+      }).catch(() => {
+        Indicator.close()
       })
     },
     getIndexByRouteName (routeName) {

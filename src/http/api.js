@@ -27,7 +27,7 @@ let getSession = new Promise((resolve, reject) => {
       setLocal('clear_session_expires_in', new Date().getTime() + 2 * 60 * 60 * 1000)
       setLocal('appid', getSearchParamByName('appid'))
       resolve()
-    })
+    }).catch(() => { reject() })
   }
 })
 
@@ -38,7 +38,9 @@ export const apiGetOrderList = () => {
       let params = {
         action: 'getOrderInfo'
       }
-      http.post('/businfo', params).then(res => resolve(res.data.data))
+      http.post('/businfo', params)
+        .then(res => resolve(res.data.data))
+        .catch(() => { reject() })
     })
   })
   return promise
@@ -51,8 +53,10 @@ export const apiGetRouteList = () => {
       let params = {
         action: 'getLineList'
       }
-      http.post('/businfo', params).then(res => resolve(res.data.data))
-    })
+      http.post('/businfo', params)
+        .then(res => resolve(res.data.data))
+        .catch(() => { reject() })
+    }).catch(() => { reject() })
   })
   return promise
 }
@@ -65,10 +69,10 @@ export const apiSubmitOrder = (data) => {
         action: 'submitOrder',
         data: data
       }
-      http.post('/businfo', params).then(
-        res => resolve(res.data.data)
-      ).catch(() => { reject() })
-    })
+      http.post('/businfo', params)
+        .then(res => resolve(res.data.data))
+        .catch(() => { reject() })
+    }).catch(() => { reject() })
   })
   return promise
 }
