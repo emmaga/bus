@@ -15,8 +15,8 @@ axios.interceptors.request.use(function (config) {
       duration: 5000
     })
   } else {
-    if (getLocal('clear_session')) {
-      config.data.clear_session = getLocal('clear_session')
+    if (getLocal('bus_clear_session')) {
+      config.data.clear_session = getLocal('bus_clear_session')
     }
     return config
   }

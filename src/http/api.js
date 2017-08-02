@@ -4,16 +4,16 @@ import {getSearchParamByName} from '@/util/searchParams'
 import {enableMock} from '@/mock'
 import {mockAppid, mockClearSession, mockClearSessionExpiresIn} from '@/mock/data'
 
-// 判断clear_session是否过期
+// 判断bus_clear_session是否过期
 let getSession = new Promise((resolve, reject) => {
-  if (getLocal('clear_session') && getLocal('clear_session_expires_in') &&
-    (getLocal('clear_session_expires_in') - 1000) > new Date().getTime() &&
-    getLocal('appid') && getLocal('appid') === getSearchParamByName('appid')) {
+  if (getLocal('bus_clear_session') && getLocal('bus_clear_session_expires_in') &&
+    (getLocal('bus_clear_session_expires_in') - 1000) > new Date().getTime() &&
+    getLocal('bus_appid') && getLocal('bus_appid') === getSearchParamByName('appid')) {
     resolve()
   } else if (enableMock) {
-    setLocal('clear_session', mockClearSession)
-    setLocal('clear_session_expires_in', mockClearSessionExpiresIn)
-    setLocal('appid', mockAppid)
+    setLocal('bus_clear_session', mockClearSession)
+    setLocal('bus_clear_session_expires_in', mockClearSessionExpiresIn)
+    setLocal('bus_appid', mockAppid)
     resolve()
   } else {
     let params = {
@@ -22,10 +22,10 @@ let getSession = new Promise((resolve, reject) => {
     }
     http.post('/buildsession', params).then((res) => {
       let data = res.data
-      setLocal('clear_session', data.clear_session)
+      setLocal('bus_clear_session', data.clear_session)
       // 假设 token 两小时过期，需要后台给此参数
-      setLocal('clear_session_expires_in', new Date().getTime() + 2 * 60 * 60 * 1000)
-      setLocal('appid', getSearchParamByName('appid'))
+      setLocal('bus_clear_session_expires_in', new Date().getTime() + 2 * 60 * 60 * 1000)
+      setLocal('bus_appid', getSearchParamByName('appid'))
       resolve()
     }).catch(() => { reject() })
   }
