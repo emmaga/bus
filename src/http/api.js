@@ -65,7 +65,9 @@ export const apiSubmitOrder = (data) => {
         action: 'submitOrder',
         data: data
       }
-      http.post('/businfo', params).then(res => resolve(res.data.data))
+      http.post('/businfo', params).then(
+        res => resolve(res.data.data)
+      ).catch(() => { reject() })
     })
   })
   return promise

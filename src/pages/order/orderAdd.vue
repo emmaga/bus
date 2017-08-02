@@ -15,6 +15,8 @@
         ref="picker1"
         v-model="date"
         type="date"
+        :startDate="startDate"
+        :endDate="endDate"
         @confirm="handleChange">
       </mt-datetime-picker>
     </div>
@@ -26,10 +28,10 @@
     </mt-popup>
     <!--班次-->
     <!--姓名-->
-    <mt-field label="姓名" placeholder="请输入姓名" v-model="orderName" v-bind:state="orderNameState"></mt-field>
+    <mt-field label="姓名" placeholder="请输入姓名" v-model="orderName" :state="orderNameState"></mt-field>
     <!--姓名-->
     <!--手机-->
-    <mt-field type="tel" label="手机" placeholder="请输入手机号码" v-model="phoneNum" v-bind:state="phoneNumState"></mt-field>
+    <mt-field type="tel" label="手机" placeholder="请输入手机号码" v-model="phoneNum" :state="phoneNumState"></mt-field>
     <!--手机-->
     <!--人数-->
     <mt-button @click.native="peopleCountPopup = true" size="large">{{peopleCount[0].value}}</mt-button>
@@ -38,19 +40,22 @@
     </mt-popup>
     <!--人数-->
     <!--提交按钮-->
-    <mt-button @click.native="submitForm()" type="primary">提交预约</mt-button>
+    <mt-button @click.native="submitForm()" :disabled="ordering" type="primary">{{orderBtnStr}}</mt-button>
     <!--提交按钮-->
   </div>
 </template>
 
 <script>
 import {apiGetRouteList, apiSubmitOrder} from '@/http/api'
-import {MessageBox} from 'mint-ui'
+import {MessageBox, Toast} from 'mint-ui'
 import moment from 'moment'
 export default {
   name: 'orderAdd',
   data () {
     return {
+      startDate: new Date(),
+      endDate: new Date(new Date().getTime() + 1 * 365 * 24 * 60 * 60 * 1000),
+      ordering: false,
       routeInfoIndex: 0,
       routeListData: [],
       routeListPopup: false,
@@ -69,7 +74,9 @@ export default {
       date: moment(new Date()).format('YYYY-MM-DD'),
       visible: false,
       orderName: '',
+      orderNameOrig: true,
       phoneNum: null,
+      phoneNumOrig: true,
       peopleCount: [
         {
           flex: 1,
@@ -93,14 +100,20 @@ export default {
     this.init()
   },
   computed: {
+    orderBtnStr: function () {
+      return this.ordering ? '预约中...' : '提交预约'
+    },
     orderDateString: function () {
       return moment(this.orderDate).format('YYYY-MM-DD')
     },
     orderNameState: function () {
-      return !this.orderName ? 'error' : ''
+      return (!this.orderName && !this.orderNameOrig) ? 'error' : ''
     },
     phoneNumState: function () {
-      return !this.phoneNum ? 'error' : ''
+      return (!this.phoneNum && !this.phoneNumOrig) ? 'error' : ''
+    },
+    validated: function () {
+      return this.orderNameState !== 'error' && this.phoneNumState !== 'error'
     }
   },
   methods: {
@@ -109,7 +122,14 @@ export default {
       moment.locale('zh-cn')
     },
     submitForm () {
-      if (this.orderNameState === 'error' || this.phoneNumState === 'error') {
+      this.orderNameOrig = false
+      this.phoneNumOrig = false
+      if (!this.validated) {
+        Toast({
+          message: '还有信息没填对或者填错啦',
+          position: 'center',
+          duration: 5000
+        })
         return
       }
       let lineID = this.getLineIdByTime(this.lineList[0].value)
@@ -120,13 +140,17 @@ export default {
         Phone: this.phoneNum,
         Number: this.peopleCount[0].value
       }
+      this.ordering = true
       apiSubmitOrder(data).then((data) => {
+        this.ordering = false
         if (data === 'Overdue') {
           MessageBox('提示', '您预约的班车已经过期')
         } else {
           MessageBox('提示', '预约成功')
           this.$bus.$emit('ordered')
         }
+      }).catch(() => {
+        this.ordering = false
       })
     },
     onRouteListChange (picker, values) {
@@ -157,7 +181,9 @@ export default {
       apiGetRouteList().then((data) => {
         this.routeListData = data.RouteInfo
         data.RouteInfo.forEach((val, index) => {
-          this.routeList[0].values.push(val.Name)
+          if (val.LineInfo.length > 0) {
+            this.routeList[0].values.push(val.Name)
+          }
         })
       })
     },

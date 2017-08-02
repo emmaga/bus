@@ -39,11 +39,17 @@ axios.interceptors.response.use(function (response) {
       position: 'top',
       duration: 5000
     })
+    return Promise.reject()
   } else {
     return response
   }
 }, function (error) {
   // 请求错误时做些事
+  Toast({
+    message: '出错啦',
+    position: 'top',
+    duration: 5000
+  })
   return Promise.reject(error)
 })
 

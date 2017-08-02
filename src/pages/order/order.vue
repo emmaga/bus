@@ -1,7 +1,7 @@
 <template>
   <div>
     <order-list></order-list>
-    继续预约
+    <v-if v-if="orderNum > 0">继续预约</v-if>
     <order-add></order-add>
   </div>
 </template>
@@ -13,9 +13,15 @@ export default {
   name: 'order',
   data () {
     return {
+      orderNum: 0
     }
   },
   created () {
+    this.$on('changeOrderNum', (orderNum) => {
+      this.orderNum = orderNum
+    })
+  },
+  methods: {
   },
   components: {
     orderAdd, orderList

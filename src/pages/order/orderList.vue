@@ -11,8 +11,8 @@
         </div>
         <div class="page-swipe">
           <mt-swipe :auto="4000">
-            <mt-swipe-item v-for="(img, index) in item.Picture" v-bind:class="'slide' + index">
-              <img v-bind:src="img.ImageURL">
+            <mt-swipe-item v-for="(img, index) in item.Picture" :key="img.ImageURL" :class="'slide' + index">
+              <img :src="img.ImageURL">
             </mt-swipe-item>
           </mt-swipe>
         </div>
@@ -57,6 +57,7 @@ export default {
     getOrderList () {
       apiGetOrderList().then((data) => {
         this.orderListData = data
+        this.$parent.$emit('changeOrderNum', this.orderListData.length)
       })
     },
     cancelOrder (orderID) {
