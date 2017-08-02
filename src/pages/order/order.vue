@@ -1,8 +1,16 @@
 <template>
   <div>
     <order-list></order-list>
-    <v-if v-if="orderNum > 0">继续预约</v-if>
-    <order-add></order-add>
+    <div class="card" style="margin-bottom: 4rem">
+      <v-if v-if="orderNum > 0">
+        <div class="card-title">
+          <h1>继续预约</h1>
+        </div>
+      </v-if>
+
+        <order-add></order-add>
+      
+    </div>
   </div>
 </template>
 
@@ -31,4 +39,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+  h1{
+    font-weight: normal;
+  }
 </style>
