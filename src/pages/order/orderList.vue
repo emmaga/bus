@@ -81,16 +81,18 @@ export default {
       })
     },
     cancelOrder (orderID) {
-      let data = {
-        ID: orderID
-      }
-      apiCancelOrder(data).then((data) => {
-        if (data === 'Success') {
-          MessageBox('提示', '取消成功')
-          this.getOrderList()
-        } else {
-          MessageBox('提示', '取消失败')
+      MessageBox.confirm('确定取消预约?', '提示').then(action => {
+        let data = {
+          ID: orderID
         }
+        apiCancelOrder(data).then((data) => {
+          if (data === 'Success') {
+            MessageBox('提示', '取消成功')
+            this.getOrderList()
+          } else {
+            MessageBox('提示', '取消失败')
+          }
+        })
       })
     }
   }
