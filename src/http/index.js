@@ -14,6 +14,8 @@ axios.interceptors.request.use(function (config) {
       position: 'top',
       duration: 5000
     })
+    // todo 中断request
+    return Promise.reject()
   } else {
     if (getLocal('bus_clear_session')) {
       config.data.clear_session = getLocal('bus_clear_session')
@@ -45,12 +47,15 @@ axios.interceptors.response.use(function (response) {
   }
 }, function (error) {
   // 请求错误时做些事
-  Toast({
-    message: '出错啦',
-    position: 'top',
-    duration: 5000
-  })
-  return Promise.reject(error)
+  // 如果request处中断了请求的发送，可以不做这个判断
+  if (navigator.onLine) {
+    Toast({
+      message: '出错啦',
+      position: 'top',
+      duration: 5000
+    })
+    return Promise.reject(error)
+  }
 })
 
 // 将axios挂载到prototype上，在组件中可以直接使用this.axios访问

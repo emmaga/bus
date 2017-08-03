@@ -41,7 +41,7 @@ export const apiGetOrderList = () => {
       http.post('/businfo', params)
         .then(res => resolve(res.data.data))
         .catch(() => { reject() })
-    })
+    }).catch(() => { reject() })
   })
   return promise
 }
