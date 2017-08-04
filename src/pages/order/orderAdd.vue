@@ -65,7 +65,7 @@ export default {
   name: 'orderAdd',
   data () {
     return {
-      startDate: new Date(),
+      startDate: new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000),
       endDate: new Date(new Date().getTime() + 1 * 365 * 24 * 60 * 60 * 1000),
       ordering: false,
       routeInfoIndex: 0,
@@ -73,7 +73,7 @@ export default {
       routeListPopup: false,
       lineListPopup: false,
       peopleCountPopup: false,
-      orderDate: new Date(),
+      orderDate: new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000),
       routeList: [
         {
           value: '',
@@ -83,7 +83,7 @@ export default {
           textAlign: 'center'
         }
       ],
-      date: moment(new Date()).format('YYYY-MM-DD'),
+      date: moment(new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000)).format('YYYY-MM-DD'),
       visible: false,
       orderName: '',
       orderNameOrig: true,
@@ -119,10 +119,18 @@ export default {
       return moment(this.orderDate).format('YYYY-MM-DD')
     },
     orderNameState: function () {
-      return (!this.orderName && !this.orderNameOrig) ? 'error' : ''
+      return (!this.orderNameOrig && (!this.orderName || !this.orderNameLenValid)) ? 'error' : ''
+    },
+    orderNameLenValid: function () {
+      let reg = /^[\u4E00-\u9FA5\uF900-\uFA2D]{2,}$/
+      return reg.test(this.orderName)
     },
     phoneNumState: function () {
-      return (!this.phoneNum && !this.phoneNumOrig) ? 'error' : ''
+      return (!this.phoneNumOrig && (!this.phoneNum || !this.phoneNumLenValid)) ? 'error' : ''
+    },
+    phoneNumLenValid: function () {
+      let reg = /^\d{11}$/
+      return reg.test(this.phoneNum)
     },
     validated: function () {
       return this.orderNameState !== 'error' && this.phoneNumState !== 'error'
@@ -136,6 +144,22 @@ export default {
     submitForm () {
       this.orderNameOrig = false
       this.phoneNumOrig = false
+      if (!this.orderNameLenValid) {
+        Toast({
+          message: '联系人名字必须由1个以上汉字组成',
+          position: 'center',
+          duration: 5000
+        })
+        return
+      }
+      if (!this.phoneNumLenValid) {
+        Toast({
+          message: '请输入11位手机号码',
+          position: 'center',
+          duration: 5000
+        })
+        return
+      }
       if (!this.validated) {
         Toast({
           message: '还有信息没填或者填错啦',

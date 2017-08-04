@@ -3,7 +3,7 @@ import axios from 'axios'
 import {getLocal} from '@/util/store'
 import {Toast} from 'mint-ui'
 
-axios.defaults.baseURL = 'http://openvoddev.cleartv.cn/backend_wx/v1/'
+axios.defaults.baseURL = 'http://openvod.cleartv.cn/backend_wx/v1/'
 
 // Add a request interceptor
 axios.interceptors.request.use(function (config) {
