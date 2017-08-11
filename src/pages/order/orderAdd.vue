@@ -127,11 +127,7 @@ export default {
       return new Date(new Date().getTime() + this.MaxAdvanceDays * 24 * 60 * 60 * 1000)
     },
     inServiceTime: function () {
-      if (moment().isBetween(moment().format('YYYY-MM-DD') + ' ' + this.startTime, moment().format('YYYY-MM-DD') + ' ' + this.endTime)) {
-        return true
-      } else {
-        return false
-      }
+      return moment().isBetween(moment().format('YYYY-MM-DD') + ' ' + this.startTime, moment().format('YYYY-MM-DD') + ' ' + this.endTime)
     },
     cantSubmit: function () {
       if (!this.inServiceTime) {
@@ -231,13 +227,11 @@ export default {
       this.routeListData[this.routeInfoIndex].LineInfo.forEach((val, index) => {
         this.lineList[0].values.push(val.Time)
       })
-      this.lineList[0].values.push
       // 更新提前时间和开始结束时间
       this.MaxAdvanceDays = this.routeListData[this.routeInfoIndex].MaxAdvanceReservationDays
       this.MinAdvanceDays = this.routeListData[this.routeInfoIndex].MinAdvanceReservationDays
       this.startTime = this.routeListData[this.routeInfoIndex].ReservationTime.StartTime
       this.endTime = this.routeListData[this.routeInfoIndex].ReservationTime.EndTime
-      // this.endTime = '14:00:00'
       this.orderDate = this.startDate
     },
     onPeopleCountChange (picker, values) {
