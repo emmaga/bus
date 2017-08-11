@@ -2,6 +2,7 @@
   <div>
     <!--订单列表-->
     <div class="card" v-for="item in orderListData">
+    <!-- <div class="card" v-for="item in showArrived"> -->
       <!-- 已经到达 -->
       <div v-if="'BusArrive' === item.Type">
         <div class="card-title">
@@ -22,14 +23,19 @@
         <div class="card-footer">
           <p>
             您已预约{{item.Number}}人乘车
-            <br>如有疑问请拨打&nbsp{{item.LineInfo.RouteInfo.Phone}}
+            <br>如有疑问请拨打&nbsp;{{item.LineInfo.RouteInfo.Phone}}
           </p>
         </div>
       </div>
       <!-- 预约成功 -->
+      <!-- <div class="card" v-for="item in orderedBus"> -->
       <div v-if="'PreOrder' === item.Type">
+      <!-- <div v-if="item.show === true"> -->
         <div class="card-title">
-          <h1>😄 预约成功!</h1>
+          <h1 v-if="item.Status === 'ACCEPT'">😄 预约成功!</h1>
+          <h1 v-if="item.Status === 'DECLINE'">😢 审核未通过!</h1>
+          <h1 v-if="item.Status === 'WAITAPPROVAL'">⏳ 审核中</h1>
+          <h1 v-if="item.Status === 'ADMIN_CANCEL'">😭 管理员取消预约</h1>
         </div>
         <div class="card-body">
           <h2>
@@ -41,9 +47,8 @@
           <br>
           <p>
             请在上车前再次打开此页面查看班车位置
-            <br>如有疑问请拨打&nbsp{{item.LineInfo.RouteInfo.Phone}}
+            <br>如有疑问请拨打&nbsp;{{item.LineInfo.RouteInfo.Phone}}
           </p>
-
         </div>
         <div class="card-footer">
           <mt-button @click.native="cancelOrder(item.OrderID)" type="primary" style="width: 100%">取消预约</mt-button>
@@ -80,6 +85,7 @@ export default {
     getOrderList () {
       apiGetOrderList().then((data) => {
         this.orderListData = data
+        console.log(this.orderListData)
         this.$parent.$emit('changeOrderNum', this.orderListData.length)
       })
     },

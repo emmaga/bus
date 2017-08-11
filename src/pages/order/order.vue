@@ -2,11 +2,11 @@
   <div>
     <order-list></order-list>
     <div class="card">
-      <v-if v-if="orderNum > 0">
+      <div v-if="orderNum > 0">
         <div class="card-title">
           <h1>继续预约</h1>
         </div>
-      </v-if>
+      </div>
       <order-add></order-add>
     </div>
   </div>
