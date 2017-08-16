@@ -149,21 +149,21 @@ export default {
       return moment(this.orderDate).format('YYYY-MM-DD')
     },
     orderNameState: function () {
-      return (!this.orderNameOrig && (!this.orderName || !this.orderNameLenValid)) ? 'error' : ''
+      return (!this.orderNameOrig && (!this.orderName || !this.orderNameLenValid)) ? 'warning' : ''
     },
     orderNameLenValid: function () {
       let reg = /^[\u4E00-\u9FA5\uF900-\uFA2D]{2,}$/
       return reg.test(this.orderName)
     },
     phoneNumState: function () {
-      return (!this.phoneNumOrig && (!this.phoneNum || !this.phoneNumLenValid)) ? 'error' : ''
+      return (!this.phoneNumOrig && (!this.phoneNum || !this.phoneNumLenValid)) ? 'warning' : ''
     },
     phoneNumLenValid: function () {
       let reg = /^\d{11}$/
       return reg.test(this.phoneNum)
     },
     validated: function () {
-      return this.orderNameState !== 'error' && this.phoneNumState !== 'error'
+      return this.orderNameState !== 'warning' && this.phoneNumState !== 'warning'
     }
   },
   methods: {
@@ -176,7 +176,7 @@ export default {
       this.phoneNumOrig = false
       if (!this.orderNameLenValid) {
         Toast({
-          message: '联系人名字必须由1个以上汉字组成',
+          message: '联系人名字必须由2个及以上汉字组成',
           position: 'center',
           duration: 5000
         })
