@@ -8,7 +8,7 @@
         <mt-picker :slots="routeList" @change="onRouteListChange"></mt-picker>
       </mt-popup>
       <p>
-        <br>&nbsp;本线路预订时间为每天 {{startTime}}-{{endTime}}
+        <br>&nbsp;本线路预订时间为每天 {{startHHmm}}-{{endHHmm}}
         <br>&nbsp;其他时间请到酒店前台预订。
         <br>&nbsp;预订需提前{{MinAdvanceDays}}天，最多可预订{{MaxAdvanceDays}}天内的班车。
       </p>
@@ -120,6 +120,12 @@ export default {
     this.init()
   },
   computed: {
+    startHHmm: function () {
+      return this.startTime.slice(0, 5)
+    },
+    endHHmm: function () {
+      return this.endTime.slice(0, 5)
+    },
     startDate: function () {
       return new Date(new Date().getTime() + this.MinAdvanceDays * 24 * 60 * 60 * 1000)
     },
