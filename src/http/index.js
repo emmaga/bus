@@ -17,7 +17,7 @@ axios.interceptors.request.use(function (config) {
     // todo 中断request
     return Promise.reject()
   } else {
-    if (getLocal('bus_clear_session')) {
+    if (getLocal('bus_clear_session') && !config.data.clear_session) {
       config.data.clear_session = getLocal('bus_clear_session')
     }
     return config
