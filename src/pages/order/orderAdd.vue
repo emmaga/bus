@@ -3,10 +3,12 @@
     <div class="card-body">
       <!--线路-->
       <h2>班车线路</h2>
-      <mt-button @click.native="routeListPopup = true" size="large">{{routeList[0].value}}</mt-button>
-      <mt-popup v-model="routeListPopup" position="bottom" class="mint-popup-bottom">
-        <mt-picker :slots="routeList" @change="onRouteListChange"></mt-picker>
-      </mt-popup>
+      <div class="selectContainer">
+        <span>{{ selectedRoute }}</span>
+        <select class="selectList" v-model="selectedRoute">
+          <option v-for="routeName in routeList">{{ routeName }}</option>
+        </select>
+      </div>
       <p>
         <br>&nbsp;本线路预订时间为每天 {{startHHmm}}-{{endHHmm}}
         <br>&nbsp;其他时间请到酒店前台预订。
@@ -16,40 +18,35 @@
       <br>
       <!--班车日期-->
       <h2>预约日期</h2>
-      <div class="page-datetime">
-        <div class="page-datetime-wrapper">
-          <mt-button @click.native="open('picker1')" size="large">{{orderDateString}}</mt-button>
-        </div>
-        <mt-datetime-picker
-          ref="picker1"
-          v-model="date"
-          type="date"
-          :startDate="startDate"
-          :endDate="endDate"
-          @confirm="handleChange">
-        </mt-datetime-picker>
-      </div>
+      <group>
+        <datetime v-model="selectedDate" :start-date="startDate" :end-date="endDate" format="YYYY-MM-DD">
+        </datetime>
+      </group>
       <!--班车日期-->
       <br>
       <!--班次-->
       <h2>出发时间</h2>
-      <mt-button @click.native="lineListPopup = true" size="large">{{lineList[0].value}}</mt-button>
-      <mt-popup v-model="lineListPopup" position="bottom" class="mint-popup-bottom">
-        <mt-picker :slots="lineList" @change="onLineListChange"></mt-picker>
-      </mt-popup>
+      <div class="selectContainer">
+        <span>{{ selectedLine }}</span>
+        <select class="selectList" v-model="selectedLine">
+          <option v-for="lineTime in lineList">{{ lineTime }}</option>
+        </select>
+      </div>
       <!--班次-->
       <br>
       <!--人数-->
       <h2>乘车人数</h2>
-      <mt-button @click.native="peopleCountPopup = true" size="large">{{peopleCount[0].value}}</mt-button>
-      <mt-popup v-model="peopleCountPopup" position="bottom" class="mint-popup-bottom">
-        <mt-picker :slots="peopleCount" @change="onPeopleCountChange"></mt-picker>
-      </mt-popup>
+      <div class="selectContainer">
+        <span>{{ selectedCount }}</span>
+        <select class="selectList" v-model="selectedCount">
+          <option v-for="count in peopleCount">{{ count }}</option>
+        </select>
+      </div>
       <!--人数-->
       <br>
-      <!--联系人姓名-->
-      <mt-field label="联系人" placeholder="请输入姓名" v-model="orderName" :state="orderNameState"></mt-field>
-      <!--联系人姓名-->
+      <!--预订人姓名-->
+      <mt-field label="预订人" placeholder="请输入姓名" v-model="orderName" :state="orderNameState"></mt-field>
+      <!--预订人姓名-->
       <!--手机-->
       <mt-field type="tel" label="手机" placeholder="请输入手机号码" v-model="phoneNum" :state="phoneNumState"></mt-field>
       <!--手机-->
@@ -66,58 +63,62 @@
 import {apiGetRouteList, apiSubmitOrder} from '@/http/api'
 import {MessageBox, Toast, Indicator} from 'mint-ui'
 import moment from 'moment'
+import {Group, Datetime} from 'vux'
 export default {
   name: 'orderAdd',
+  components: {
+    Group,
+    Datetime
+  },
   data () {
     return {
-      startTime: '',
+      routeList: [], // 选框数组
+      lineList: [],
+      peopleCount: [],
+      selectedRoute: '', // 当前选项
+      selectedDate: '',
+      selectedLine: '',
+      selectedCount: 0,
+      startTime: '', // 限制
       endTime: '',
       MaxAdvanceDays: 0,
       MinAdvanceDays: 0,
       ordering: false,
       routeInfoIndex: 0,
       routeListData: [],
-      routeListPopup: false,
-      lineListPopup: false,
-      peopleCountPopup: false,
-      routeList: [
-        {
-          value: '',
-          flex: 1,
-          values: [],
-          className: 'slot1',
-          textAlign: 'center'
-        }
-      ],
-      date: moment(this.startTime).format('YYYY-MM-DD'),
-      orderDate: new Date(),
       visible: false,
       orderName: '',
       orderNameOrig: true,
       phoneNum: null,
-      phoneNumOrig: true,
-      peopleCount: [
-        {
-          value: 1,
-          flex: 1,
-          values: [],
-          className: 'slot1',
-          textAlign: 'center'
-        }
-      ],
-      lineList: [
-        {
-          value: '',
-          flex: 1,
-          values: ['08:00', '09:00'],
-          className: 'slot1',
-          textAlign: 'center'
-        }
-      ]
+      phoneNumOrig: true
     }
   },
   created () {
     this.init()
+  },
+  watch: {
+    selectedRoute: function (routeName) {
+      this.routeInfoIndex = this.getIndexByRouteName(routeName)
+      this.lineList = []
+      this.routeListData[this.routeInfoIndex].LineInfo.forEach((val, index) => {
+        this.lineList.push(val.Time)
+      })
+      // 更新提前时间和开始结束时间
+      this.MaxAdvanceDays = this.routeListData[this.routeInfoIndex].MaxAdvanceReservationDays
+      this.MinAdvanceDays = this.routeListData[this.routeInfoIndex].MinAdvanceReservationDays
+      this.startTime = this.routeListData[this.routeInfoIndex].ReservationTime.StartTime
+      this.endTime = this.routeListData[this.routeInfoIndex].ReservationTime.EndTime
+      this.selectedDate = this.startDate
+      this.selectedLine = this.lineList[0]
+    },
+    selectedLine: function () {
+      let MaxPerOrder = this.getMaxPerOrder(this.selectedLine)
+      this.peopleCount = []
+      for (let i = 1; i < MaxPerOrder + 1; i++) {
+        this.peopleCount.push(i)
+      }
+      this.selectedCount = this.peopleCount[0]
+    }
   },
   computed: {
     startHHmm: function () {
@@ -127,10 +128,10 @@ export default {
       return this.endTime.slice(0, 5)
     },
     startDate: function () {
-      return new Date(new Date().getTime() + this.MinAdvanceDays * 24 * 60 * 60 * 1000)
+      return moment().set('date', moment().get('date') + this.MinAdvanceDays).format('YYYY-MM-DD')
     },
     endDate: function () {
-      return new Date(new Date().getTime() + this.MaxAdvanceDays * 24 * 60 * 60 * 1000)
+      return moment().set('date', moment().get('date') + this.MaxAdvanceDays).format('YYYY-MM-DD')
     },
     inServiceTime: function () {
       return moment().isBetween(moment().format('YYYY-MM-DD') + ' ' + this.startTime, moment().format('YYYY-MM-DD') + ' ' + this.endTime)
@@ -150,9 +151,6 @@ export default {
       } else {
         return this.ordering ? '预约中...' : '提交预约'
       }
-    },
-    orderDateString: function () {
-      return moment(this.orderDate).format('YYYY-MM-DD')
     },
     orderNameState: function () {
       return (!this.orderNameOrig && (!this.orderName || !this.orderNameLenValid)) ? 'warning' : ''
@@ -178,6 +176,7 @@ export default {
       moment.locale('zh-cn')
     },
     submitForm () {
+      console.log(this.selectedCount)
       this.orderNameOrig = false
       this.phoneNumOrig = false
       if (!this.orderNameLenValid) {
@@ -204,13 +203,13 @@ export default {
         })
         return
       }
-      let lineID = this.getLineIdByTime(this.lineList[0].value)
+      let lineID = this.getLineIdByTime(this.selectedLine)
       let data = {
         LineID: lineID,
-        Date: this.orderDateString,
+        Date: this.selectedDate,
         Name: this.orderName,
         Phone: this.phoneNum,
-        Number: this.peopleCount[0].value
+        Number: parseInt(this.selectedCount)
       }
       this.ordering = true
       apiSubmitOrder(data).then((data) => {
@@ -225,40 +224,6 @@ export default {
         this.ordering = false
       })
     },
-    onRouteListChange (picker, values) {
-      this.routeList[0].value = values[0]
-      this.routeListPopup = false
-      this.routeInfoIndex = this.getIndexByRouteName(values[0])
-      this.lineList[0].values = []
-      this.routeListData[this.routeInfoIndex].LineInfo.forEach((val, index) => {
-        this.lineList[0].values.push(val.Time)
-      })
-      // 更新提前时间和开始结束时间
-      this.MaxAdvanceDays = this.routeListData[this.routeInfoIndex].MaxAdvanceReservationDays
-      this.MinAdvanceDays = this.routeListData[this.routeInfoIndex].MinAdvanceReservationDays
-      this.startTime = this.routeListData[this.routeInfoIndex].ReservationTime.StartTime
-      this.endTime = this.routeListData[this.routeInfoIndex].ReservationTime.EndTime
-      this.orderDate = this.startDate
-    },
-    onPeopleCountChange (picker, values) {
-      this.peopleCount[0].value = values[0]
-      this.peopleCountPopup = false
-    },
-    onLineListChange (picker, values) {
-      this.lineList[0].value = values[0]
-      this.lineListPopup = false
-      let MaxPerOrder = this.getMaxPerOrder(this.lineList[0].value)
-      this.peopleCount[0].values = []
-      for (let i = 1; i < MaxPerOrder + 1; i++) {
-        this.peopleCount[0].values.push(i)
-      }
-    },
-    open (picker) {
-      this.$refs[picker].open()
-    },
-    handleChange (value) {
-      this.orderDate = value.toString()
-    },
     getRouteList () {
       Indicator.open()
       apiGetRouteList().then((data) => {
@@ -266,9 +231,10 @@ export default {
         this.routeListData = data.RouteInfo
         data.RouteInfo.forEach((val, index) => {
           if (val.LineInfo.length > 0) {
-            this.routeList[0].values.push(val.Name)
+            this.routeList.push(val.Name)
           }
         })
+        this.selectedRoute = this.routeList[0]
       }).catch(() => {
         Indicator.close()
       })
@@ -301,15 +267,78 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-.mint-popup-bottom {
+<style>
+/*原生选框的样式*/
+.selectContainer {
+  text-align: center;
+  position: relative;
   width: 100%;
-  .picker-slot-wrapper, .picker-item {
-    backface-visibility: hidden;
-  }
+  height: 41px;
 }
-
-h2{
-  margin-bottom: 0.325rem
+.selectContainer span {
+  display: block;
+  height: 41px;
+  line-height: 41px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  border: 0;
+  font-size: 18px;
+  color: #656b79;
+  background-color: #f6f8fa;
+}
+.selectList{
+  -webkit-appearance: none;
+  appearance: none;
+  position: absolute;  
+  left: 0px;  
+  top: 0px;  
+  width: 100%;  
+  height:41px;  
+  opacity: 0; 
+  outline: 0;
+}
+.selectList option {
+  text-align: center;
+}
+.selectContainer::before, .weui-cell__ft::before {
+  content: "";
+  display: block;
+  width: 0;
+  height: 0;
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  border: solid 9px transparent;
+  border-top: solid 9px black;
+}
+.dp-right {
+  color: #26A2FF !important;
+}
+/*日历的样式*/
+.weui-cells {
+  margin-top: 0 !important;
+}
+.weui-cells::before, .weui-cells::after, .weui-cell__ft::after {
+  display: none !important;
+}
+.weui-cell {
+  padding: 0 !important;
+  border: 0;
+  border-radius: 4px;
+  height: 41px;
+  line-height: 41px; 
+  font-size: 18px;
+  background-color: #f6f8fa;
+}
+.weui-cell__ft {
+  text-align: center !important;
+  color: #656b79 !important;
+  padding-right: 0 !important;
+}
+.card-body a {
+  text-decoration: none;
+}
+.card-body h2{
+  margin-bottom: 0.325rem;
 }
 </style>
