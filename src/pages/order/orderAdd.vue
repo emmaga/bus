@@ -303,18 +303,19 @@ export default {
 .selectContainer::before, .weui-cell__ft::before {
   content: "";
   display: block;
-  width: 0;
-  height: 0;
+  width: 10px;
+  height: 10px;
   position: absolute;
-  top: 15px;
+  top: 13px;
   right: 20px;
-  border: solid 9px transparent;
-  border-top: solid 9px black;
+  border-bottom: solid 2px #c2c2c2;
+  border-left: solid 2px #c2c2c2;
+  transform:rotate(-45deg);
 }
+/*日历的样式*/
 .dp-right {
   color: #26A2FF !important;
 }
-/*日历的样式*/
 .weui-cells {
   margin-top: 0 !important;
 }
