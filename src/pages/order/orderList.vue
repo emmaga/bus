@@ -41,6 +41,11 @@
             <br>人数：{{item.Number}}人
             <br>班次：{{item.LineInfo.Time}}
             <br>路线：{{item.LineInfo.RouteInfo.Name}}
+            <br>
+            <div v-show="item.LineInfo.RouteInfo.Type === '机场'">
+              <p v-show="item.Terminal">航站楼：{{item.Terminal}}</p>
+              <p v-show="item.Flight">航班号：{{item.Flight}}</p>
+            </div>
           </h2>
           <br>
           <p>

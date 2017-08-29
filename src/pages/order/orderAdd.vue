@@ -9,10 +9,22 @@
           <option v-for="routeName in routeList">{{ routeName }}</option>
         </select>
       </div>
+      <div v-show="isAirportLine">
+        <div v-show="hasTerminal">
+          <h2>选择航站楼</h2>
+          <div class="selectContainer">
+            <span>{{ terminalName }}</span>
+            <select class="selectList" v-model="terminalName">
+              <option v-for="terminal in terminalInfo">{{ terminal.Name }}</option>
+            </select>
+          </div>
+        </div>
+        <mt-field label="航班号" placeholder="请输入航班号" v-model="inputFlight"></mt-field>
+      </div>
       <p>
-        <br>&nbsp;本线路预订时间为每天 {{startHHmm}}-{{endHHmm}}
-        <br>&nbsp;其他时间请到酒店前台预订。
-        <br>&nbsp;预订需提前{{MinAdvanceDays}}天，最多可预订{{MaxAdvanceDays}}天内的班车。
+        <br>&nbsp;本线路的线上接单时间 {{startHHmm}}-{{endHHmm}}
+        <br>&nbsp;其他时间请到酒店前台预订
+        <br>&nbsp;预订需提前{{MinAdvanceDays}}天，最多可预订{{MaxAdvanceDays}}天内的班车
       </p>
       <!--线路-->
       <br>
@@ -79,6 +91,11 @@ export default {
       selectedDate: '',
       selectedLine: '',
       selectedCount: 0,
+      selectedRouteType: '', // 航站楼相关
+      terminalInfo: [],
+      selectedTerminal: 1,
+      terminalName: '',
+      inputFlight: '',
       startTime: '', // 限制
       endTime: '',
       MaxAdvanceDays: 0,
@@ -103,6 +120,12 @@ export default {
       this.routeListData[this.routeInfoIndex].LineInfo.forEach((val, index) => {
         this.lineList.push(val.Time)
       })
+      this.selectedRouteType = this.routeListData[this.routeInfoIndex].Type
+      this.terminalInfo = []
+      this.terminalInfo = this.routeListData[this.routeInfoIndex].TerminalInfo
+      if (this.selectedRouteType === '机场') {
+        this.terminalName = this.terminalInfo[0].Name
+      }
       // 更新提前时间和开始结束时间
       this.MaxAdvanceDays = this.routeListData[this.routeInfoIndex].MaxAdvanceReservationDays
       this.MinAdvanceDays = this.routeListData[this.routeInfoIndex].MinAdvanceReservationDays
@@ -118,9 +141,18 @@ export default {
         this.peopleCount.push(i)
       }
       this.selectedCount = this.peopleCount[0]
+    },
+    terminalName: function () {
+      this.selectedTerminal = this.terminalIDByName(this.terminalName)
     }
   },
   computed: {
+    isAirportLine () {
+      return this.selectedRouteType === '机场'
+    },
+    hasTerminal () {
+      return this.terminalInfo.length > 0
+    },
     startHHmm: function () {
       return this.startTime.slice(0, 5)
     },
@@ -131,7 +163,7 @@ export default {
       return moment().set('date', moment().get('date') + this.MinAdvanceDays).format('YYYY-MM-DD')
     },
     endDate: function () {
-      return moment().set('date', moment().get('date') + this.MaxAdvanceDays).format('YYYY-MM-DD')
+      return moment().set('date', moment().get('date') + this.MaxAdvanceDays - 1).format('YYYY-MM-DD')
     },
     inServiceTime: function () {
       return moment().isBetween(moment().format('YYYY-MM-DD') + ' ' + this.startTime, moment().format('YYYY-MM-DD') + ' ' + this.endTime)
@@ -204,12 +236,18 @@ export default {
         return
       }
       let lineID = this.getLineIdByTime(this.selectedLine)
+      if (this.selectedRouteType !== '机场') {
+        this.selectedTerminal = 0
+        this.inputFlight = ''
+      }
       let data = {
         LineID: lineID,
         Date: this.selectedDate,
         Name: this.orderName,
         Phone: this.phoneNum,
-        Number: parseInt(this.selectedCount)
+        Number: parseInt(this.selectedCount),
+        Terminal: this.selectedTerminal,
+        Flight: this.inputFlight
       }
       this.ordering = true
       apiSubmitOrder(data).then((data) => {
@@ -217,7 +255,7 @@ export default {
         if (data === 'Overdue') {
           MessageBox('提示', '您预约的班车已经过期')
         } else {
-          MessageBox('提示', '预约成功')
+          MessageBox('提示', '待审核')
           this.$bus.$emit('ordered')
         }
       }).catch(() => {
@@ -235,6 +273,7 @@ export default {
           }
         })
         this.selectedRoute = this.routeList[0]
+        this.terminalName = this.routeListData[0].TerminalInfo[0].Name
       }).catch(() => {
         Indicator.close()
       })
@@ -259,6 +298,14 @@ export default {
       for (let i = 0; i < list.length; i++) {
         if (list[i].Time === time) {
           return list[i].MaxReservationNumberPerOrder
+        }
+      }
+    },
+    terminalIDByName (name) {
+      let list = this.terminalInfo
+      for (let i = 0; i < list.length; i++) {
+        if (list[i].Name === name) {
+          return list[i].ID
         }
       }
     }
