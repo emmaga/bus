@@ -19,7 +19,7 @@
             </select>
           </div>
         </div>
-        <mt-field label="航班号" placeholder="请输入航班号" v-model="inputFlight"></mt-field>
+        <mt-field label="航班号" placeholder="请输入航班号" v-model="inputFlight" :state="flightState"></mt-field>
       </div>
       <p>
         <br>&nbsp;本线路的线上接单时间 {{startHHmm}}-{{endHHmm}}
@@ -107,7 +107,8 @@ export default {
       orderName: '',
       orderNameOrig: true,
       phoneNum: null,
-      phoneNumOrig: true
+      phoneNumOrig: true,
+      flightOrig: true
     }
   },
   created () {
@@ -123,8 +124,15 @@ export default {
       this.selectedRouteType = this.routeListData[this.routeInfoIndex].Type
       this.terminalInfo = []
       this.terminalInfo = this.routeListData[this.routeInfoIndex].TerminalInfo
-      if (this.selectedRouteType === '机场') {
-        this.terminalName = this.terminalInfo[0].Name
+      if (this.isAirportLine) {
+        if (this.terminalInfo.length > 0) {
+          this.terminalName = this.terminalInfo[0].Name
+        } else {
+          this.selectedTerminal = 0
+        }
+      } else {
+        this.selectedTerminal = 0
+        this.inputFlight = ''
       }
       // 更新提前时间和开始结束时间
       this.MaxAdvanceDays = this.routeListData[this.routeInfoIndex].MaxAdvanceReservationDays
@@ -184,6 +192,9 @@ export default {
         return this.ordering ? '预约中...' : '提交预约'
       }
     },
+    flightState: function () {
+      return (!this.flightOrig && !this.inputFlight.trim()) ? 'warning' : ''
+    },
     orderNameState: function () {
       return (!this.orderNameOrig && (!this.orderName || !this.orderNameLenValid)) ? 'warning' : ''
     },
@@ -199,7 +210,7 @@ export default {
       return reg.test(this.phoneNum)
     },
     validated: function () {
-      return this.orderNameState !== 'warning' && this.phoneNumState !== 'warning'
+      return this.orderNameState !== 'warning' && this.phoneNumState !== 'warning' && this.flightState !== 'warning'
     }
   },
   methods: {
@@ -208,9 +219,17 @@ export default {
       moment.locale('zh-cn')
     },
     submitForm () {
-      console.log(this.selectedCount)
       this.orderNameOrig = false
       this.phoneNumOrig = false
+      this.flightOrig = false
+      if (this.flightState === 'warning') {
+        Toast({
+          message: '航班号不能为空',
+          position: 'center',
+          duration: 5000
+        })
+        return
+      }
       if (!this.orderNameLenValid) {
         Toast({
           message: '联系人名字必须由2个及以上汉字组成',
@@ -236,10 +255,6 @@ export default {
         return
       }
       let lineID = this.getLineIdByTime(this.selectedLine)
-      if (this.selectedRouteType !== '机场') {
-        this.selectedTerminal = 0
-        this.inputFlight = ''
-      }
       let data = {
         LineID: lineID,
         Date: this.selectedDate,
