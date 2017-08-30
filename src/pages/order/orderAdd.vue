@@ -22,7 +22,7 @@
         <mt-field label="航班号" placeholder="请输入航班号" v-model="inputFlight" :state="flightState"></mt-field>
       </div>
       <p>
-        <br>&nbsp;本线路的线上接单时间 {{startHHmm}}-{{endHHmm}}
+        <br>&nbsp;本线路线上接单时间 {{startHHmm}}-{{endHHmm}}
         <br>&nbsp;其他时间请到酒店前台预订
         <br>&nbsp;预订需提前{{MinAdvanceDays}}天，最多可预订{{MaxAdvanceDays}}天内的班车
       </p>
@@ -193,7 +193,7 @@ export default {
       }
     },
     flightState: function () {
-      return (!this.flightOrig && !this.inputFlight.trim()) ? 'warning' : ''
+      return (this.isAirportLine && !this.flightOrig && !this.inputFlight.trim()) ? 'warning' : ''
     },
     orderNameState: function () {
       return (!this.orderNameOrig && (!this.orderName || !this.orderNameLenValid)) ? 'warning' : ''

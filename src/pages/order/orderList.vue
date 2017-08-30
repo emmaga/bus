@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!--订单列表-->
+    <!-- 订单列表 -->
     <div class="card" v-for="item in orderListData">
       <!-- 已经到达 -->
       <div v-if="'BusArrive' === item.Type && item.Status === 'ACCEPT'">
@@ -79,17 +79,17 @@ export default {
     })
   },
   methods: {
-    init () {
-      this.getOrderList()
-      setInterval(() => {
-        this.getOrderList()
-      }, 10 * 1000)
-    },
     getOrderList () {
       apiGetOrderList().then((data) => {
         this.orderListData = data
         this.$parent.$emit('changeOrderNum', this.orderListData.length)
       })
+    },
+    init () {
+      this.getOrderList()
+      setInterval(() => {
+        this.getOrderList()
+      }, 10 * 1000)
     },
     cancelOrder (orderID) {
       MessageBox.confirm('确定取消预约?', '提示').then(action => {
