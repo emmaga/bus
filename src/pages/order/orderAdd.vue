@@ -19,6 +19,7 @@
             </select>
           </div>
         </div>
+        <br>  
         <mt-field label="航班号" placeholder="请输入航班号" v-model="inputFlight" :state="flightState"></mt-field>
       </div>
       <p>
