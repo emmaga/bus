@@ -6,14 +6,14 @@ import {mockAppid, mockClearSession, mockClearSessionExpiresIn} from '@/mock/dat
 
 // 判断bus_clear_session是否过期
 let getSession = new Promise((resolve, reject) => {
-  if (getLocal('bus_clear_session') && getLocal('bus_clear_session_expires_in') &&
-    (getLocal('bus_clear_session_expires_in') - 1000) > new Date().getTime() &&
-    getLocal('bus_appid') && getLocal('bus_appid') === getSearchParamByName('appid')) {
-    resolve()
-  } else if (enableMock) {
+  if (enableMock) {
     setLocal('bus_clear_session', mockClearSession)
     setLocal('bus_clear_session_expires_in', mockClearSessionExpiresIn)
     setLocal('bus_appid', mockAppid)
+    resolve()
+  } else if (getLocal('bus_clear_session') && getLocal('bus_clear_session_expires_in') &&
+    (getLocal('bus_clear_session_expires_in') - 1000) > new Date().getTime() &&
+    getLocal('bus_appid') && getLocal('bus_appid') === getSearchParamByName('appid')) {
     resolve()
   } else {
     let params = {
